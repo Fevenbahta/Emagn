@@ -6,6 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Mail, Lock, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { authApiService } from "@/services/authApi";
+import { TokenService } from "@/services/tokenService";
+
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,24 +20,45 @@ const SignIn = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login
-    setTimeout(() => {
+    try {
+      const result = await authApiService.login({ email, password });
+
+      if (result.success && result.data) {
+        // Store the token using TokenService
+        TokenService.storeToken(result.data.token);
+        
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+        
+        // Redirect to transactions page
+        navigate("/transactions");
+      } else {
+        toast({
+          title: "Sign in failed",
+          description: result.error || "Invalid email or password",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
       toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
+        title: "Sign in failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
-      navigate("/transactions");
-    }, 1000);
+    }
   };
 
   return (
-   <div className="min-h-screen bg-gradient-to-br from-background via-secondary to-accent flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary to-accent flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       
       <div className="w-full max-w-md relative">
         {/* Logo */}
-     <Link to="/" className="flex items-center justify-center gap-2 mb-8">
+        <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <Shield className="h-10 w-10 text-primary" />
           <span className="text-3xl font-bold text-primary">Emagn</span>
         </Link>
@@ -60,6 +84,7 @@ const SignIn = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                   className="transition-all focus:shadow-soft"
                 />
               </div>
@@ -75,19 +100,24 @@ const SignIn = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                   className="transition-all focus:shadow-soft"
                 />
               </div>
               <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded border-primary text-primary focus:ring-primary" />
+                  <input 
+                    type="checkbox" 
+                    className="rounded border-primary text-primary focus:ring-primary"
+                    disabled={isLoading}
+                  />
                   <span className="text-muted-foreground">Remember me</span>
                 </label>
                 <Link to="/forgot-password" className="text-primary hover:underline">
                   Forgot password?
                 </Link>
               </div>
-              <Button type="submit"  className="w-full group" disabled={isLoading}>
+              <Button type="submit" className="w-full group" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign In"}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
@@ -103,7 +133,7 @@ const SignIn = () => {
               </div>
             </div>
             <div className="grid gap-4 w-full">
-              <Button variant="outline" type="button">
+              <Button variant="outline" type="button" disabled={isLoading}>
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -124,7 +154,6 @@ const SignIn = () => {
                 </svg>
                 Google
               </Button>
-          
             </div>
             <p className="text-center text-sm text-muted-foreground w-full">
               Don't have an account?{" "}

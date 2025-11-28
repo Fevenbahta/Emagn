@@ -7,12 +7,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Shield, Mail, Lock, User, ArrowRight, Building, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import { authApiService } from "@/services/authApi";
+import { TokenService } from "@/services/tokenService";
 
 const SignUp = () => {
-
   const [formData, setFormData] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
     password: "",
@@ -35,17 +36,56 @@ const SignUp = () => {
       return;
     }
 
+    if (formData.password.length < 8) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 8 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate registration
-    setTimeout(() => {
+    try {
+      const registerData = {
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        phone: formData.phone,
+        user_type: formData.userType,
+      };
+
+      const result = await authApiService.register(registerData);
+
+      if (result.success && result.data) {
+        // Store the token using TokenService
+        TokenService.storeToken(result.data.token);
+        
+        toast({
+          title: "Account created!",
+          description: "Welcome to Emagn. Your account has been created successfully.",
+        });
+        
+        // Redirect to transactions page
+        navigate("/transactions");
+      } else {
+        toast({
+          title: "Registration failed",
+          description: result.error || "Failed to create account. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
       toast({
-        title: "Account created!",
-        description: "Welcome to Emagn. Your account has been created successfully.",
+        title: "Registration failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
-      navigate("/transactions");
-    }, 1000);
+    }
   };
 
   const handleChange = (field: string, value: string) => {
@@ -53,12 +93,12 @@ const SignUp = () => {
   };
 
   return (
-     <div className="min-h-screen bg-gradient-to-br from-background via-secondary to-accent flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary to-accent flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       
       <div className="w-full max-w-2xl relative">
         {/* Logo */}
-      <Link to="/" className="flex items-center justify-center gap-2 mb-8">
+        <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <Shield className="h-10 w-10 text-primary" />
           <span className="text-3xl font-bold text-primary">Emagn</span>
         </Link>
@@ -74,20 +114,40 @@ const SignUp = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName" className="flex items-center gap-2">
+                  <Label htmlFor="firstName" className="flex items-center gap-2">
                     <User className="h-4 w-4 text-primary" />
-                    Full Name
+                    First Name
                   </Label>
                   <Input
-                    id="fullName"
+                    id="firstName"
                     type="text"
-                    placeholder="John Doe"
-                    value={formData.fullName}
-                    onChange={(e) => handleChange("fullName", e.target.value)}
+                    placeholder="John"
+                    value={formData.firstName}
+                    onChange={(e) => handleChange("firstName", e.target.value)}
                     required
+                    disabled={isLoading}
                     className="transition-all focus:shadow-soft"
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName" className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-primary" />
+                    Last Name
+                  </Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="Doe"
+                    value={formData.lastName}
+                    onChange={(e) => handleChange("lastName", e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="transition-all focus:shadow-soft"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-primary" />
@@ -100,12 +160,10 @@ const SignUp = () => {
                     value={formData.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     required
+                    disabled={isLoading}
                     className="transition-all focus:shadow-soft"
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-primary" />
@@ -118,15 +176,23 @@ const SignUp = () => {
                     value={formData.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
                     required
+                    disabled={isLoading}
                     className="transition-all focus:shadow-soft"
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="userType" className="flex items-center gap-2">
                     <Building className="h-4 w-4 text-primary" />
                     Account Type
                   </Label>
-                  <Select value={formData.userType} onValueChange={(value) => handleChange("userType", value)}>
+                  <Select 
+                    value={formData.userType} 
+                    onValueChange={(value) => handleChange("userType", value)}
+                    disabled={isLoading}
+                  >
                     <SelectTrigger className="transition-all focus:shadow-soft">
                       <SelectValue placeholder="Select account type" />
                     </SelectTrigger>
@@ -153,6 +219,8 @@ const SignUp = () => {
                     value={formData.password}
                     onChange={(e) => handleChange("password", e.target.value)}
                     required
+                    disabled={isLoading}
+                    minLength={8}
                     className="transition-all focus:shadow-soft"
                   />
                 </div>
@@ -168,6 +236,7 @@ const SignUp = () => {
                     value={formData.confirmPassword}
                     onChange={(e) => handleChange("confirmPassword", e.target.value)}
                     required
+                    disabled={isLoading}
                     className="transition-all focus:shadow-soft"
                   />
                 </div>
@@ -178,6 +247,7 @@ const SignUp = () => {
                   type="checkbox" 
                   id="terms" 
                   required
+                  disabled={isLoading}
                   className="mt-1 rounded border-primary text-primary focus:ring-primary" 
                 />
                 <Label htmlFor="terms" className="text-sm text-muted-foreground cursor-pointer">
@@ -196,7 +266,7 @@ const SignUp = () => {
                 </Label>
               </div>
 
-              <Button type="submit"  className="w-full group" disabled={isLoading}>
+              <Button type="submit" className="w-full group" disabled={isLoading}>
                 {isLoading ? "Creating account..." : "Create Account"}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
@@ -212,7 +282,7 @@ const SignUp = () => {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 w-full">
-              <Button variant="outline" type="button">
+              <Button variant="outline" type="button" disabled={isLoading}>
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -233,7 +303,6 @@ const SignUp = () => {
                 </svg>
                 Google
               </Button>
-           
             </div>
             <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
