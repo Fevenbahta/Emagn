@@ -1,7 +1,20 @@
-// Use proxy in development, direct URL in production
-const API_BASE_URL = import.meta.env.DEV 
-  ? '/api' 
-  : import.meta.env.VITE_API_BASE_URL || 'https://itzel-selenic-hisako.ngrok-free.dev';
+// CORS proxy solution
+const getApiBaseUrl = () => {
+  // Use CORS proxy in development
+  if (import.meta.env.DEV) {
+    // Option 1: corsproxy.io (simple)
+    return 'https://corsproxy.io/?' + encodeURIComponent('https://itzel-selenic-hisako.ngrok-free.dev');
+    
+    // Option 2: cors-anywhere (alternative)
+    // return 'https://cors-anywhere.herokuapp.com/https://itzel-selenic-hisako.ngrok-free.dev';
+    
+    // Option 3: thingproxy (another alternative)
+    // return 'https://thingproxy.freeboard.io/fetch/https://itzel-selenic-hisako.ngrok-free.dev';
+  }
+  return import.meta.env.VITE_API_URL || 'https://itzel-selenic-hisako.ngrok-free.dev';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export interface LoginData {
   email: string;
@@ -40,49 +53,59 @@ class AuthApiService {
 
   constructor() {
     this.baseURL = API_BASE_URL;
-    console.log('🔧 API Base URL:', this.baseURL);
-    console.log('🔧 Using proxy:', import.meta.env.DEV);
+    console.log('🎯 API Base URL:', this.baseURL);
+    console.log('🔧 Using CORS proxy:', import.meta.env.DEV);
   }
 
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`;
+    // For CORS proxy, we need to handle URLs differently
+    let url: string;
     
-    // Clean headers - no CORS headers needed with proxy
+    if (import.meta.env.DEV && this.baseURL.includes('corsproxy')) {
+      // When using corsproxy.io, we append the endpoint to the encoded URL
+      const baseWithoutProxy = 'https://itzel-selenic-hisako.ngrok-free.dev';
+      const fullUrl = `${baseWithoutProxy}${endpoint}`;
+      url = `https://corsproxy.io/?${encodeURIComponent(fullUrl)}`;
+    } else if (import.meta.env.DEV && this.baseURL.includes('cors-anywhere')) {
+      // When using cors-anywhere, append endpoint to base
+      url = `${this.baseURL}${endpoint}`;
+    } else {
+      // Normal URL construction for production
+      const cleanBaseURL = this.baseURL.endsWith('/') ? this.baseURL.slice(0, -1) : this.baseURL;
+      const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+      url = `${cleanBaseURL}${cleanEndpoint}`;
+    }
+    
+    console.log('🔗 Final URL being called:', url);
+
     const headers: Record<string, string> = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       ...options.headers as Record<string, string>,
     };
 
-    // Only add ngrok headers in production (direct call)
+    // Only add ngrok headers when not using proxy
     if (!import.meta.env.DEV) {
       headers['ngrok-skip-browser-warning'] = 'true';
     }
 
-    const config: RequestInit = {
-      headers,
-      ...options,
-    };
-
-    console.log('🚀 Making API request to:', url);
-
     try {
-      const response = await fetch(url, config);
+      console.log('🚀 Sending request to:', url);
       
-      console.log('📡 Response status:', response.status);
+      const response = await fetch(url, {
+        method: options.method || 'GET',
+        headers,
+        body: options.body,
+      });
+      
+      console.log('📡 Response status:', response.status, response.statusText);
 
       if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData?.message || errorData?.error || errorMessage;
-        } catch {
-          errorMessage = response.statusText || errorMessage;
-        }
-        throw new Error(errorMessage);
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
       }
 
       const data = await response.json();
@@ -92,9 +115,9 @@ class AuthApiService {
         status: response.status
       };
     } catch (error) {
-      console.error('💥 API request failed:', error);
+      console.error('💥 Request failed:', error);
       
-      let errorMessage = 'An unknown error occurred';
+      let errorMessage = 'Unknown error occurred';
       if (error instanceof Error) {
         errorMessage = error.message;
       }

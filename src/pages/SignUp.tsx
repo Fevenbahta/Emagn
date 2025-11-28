@@ -24,13 +24,76 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Extract error message from various error formats
+  const extractErrorMessage = (error: any): string => {
+    console.log("Raw error in SignUp:", error);
+    
+    // If it's already a string error message
+    if (typeof error === 'string') {
+      return error;
+    }
+    
+    // If it's an Error object with message
+    if (error?.message) {
+      const message = error.message;
+      
+      // Try to parse JSON error from HTTP response (like "HTTP 409: {"error":"user with this email already exists"}")
+      if (message.includes('{') && message.includes('}')) {
+        try {
+          const jsonMatch = message.match(/\{.*\}/);
+          if (jsonMatch) {
+            const errorObj = JSON.parse(jsonMatch[0]);
+            return errorObj.error || message;
+          }
+        } catch (e) {
+          console.log("Could not parse JSON from error message");
+        }
+      }
+      
+      return message;
+    }
+    
+    // If it's an object with error property
+    if (error?.error) {
+      return error.error;
+    }
+    
+    return "An unexpected error occurred";
+  };
+
+  // User-friendly error messages
+  const getErrorMessage = (error: any): string => {
+    const errorMessage = extractErrorMessage(error).toLowerCase();
+    console.log("Processed error message in SignUp:", errorMessage);
+    
+    const errorMessages: { [key: string]: string } = {
+      "user with this email already exists": "This email address is already registered.",
+      "invalid email": "Please enter a valid email address.",
+      "password too weak": "Please choose a stronger password with at least 8 characters including letters and numbers.",
+      "phone number already exists": "This phone number is already associated with an account.",
+      "invalid phone number": "Please enter a valid phone number.",
+      "email already exists": "This email address is already registered.",
+      "user already exists": "This email address is already registered.",
+    };
+    
+    // Check for partial matches
+    for (const [key, value] of Object.entries(errorMessages)) {
+      if (errorMessage.includes(key)) {
+        return value;
+      }
+    }
+    
+    return "We encountered an issue creating your account. Please try again.";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validation with friendly messages
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "Password mismatch",
-        description: "Passwords do not match. Please try again.",
+        title: "Passwords don't match",
+        description: "Please make sure both passwords are exactly the same.",
         variant: "destructive",
       });
       return;
@@ -39,7 +102,16 @@ const SignUp = () => {
     if (formData.password.length < 8) {
       toast({
         title: "Password too short",
-        description: "Password must be at least 8 characters long.",
+        description: "For your security, please choose a password with at least 8 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.userType) {
+      toast({
+        title: "Account type required",
+        description: "Please select how you plan to use Emagn.",
         variant: "destructive",
       });
       return;
@@ -58,29 +130,34 @@ const SignUp = () => {
       };
 
       const result = await authApiService.register(registerData);
+      console.log("Registration result:", result);
 
       if (result.success && result.data) {
-        // Store the token using TokenService
         TokenService.storeToken(result.data.token);
         
         toast({
-          title: "Account created!",
-          description: "Welcome to Emagn. Your account has been created successfully.",
+          title: "Welcome to Emagn!",
+          description: "Your account has been created successfully.",
         });
         
-        // Redirect to transactions page
         navigate("/transactions");
       } else {
+        const friendlyMessage = getErrorMessage(result.error);
+        console.log("Displaying registration error:", friendlyMessage);
+        
         toast({
-          title: "Registration failed",
-          description: result.error || "Failed to create account. Please try again.",
+          title: "Couldn't create account",
+          description: friendlyMessage,
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.log("Caught error in SignUp handleSubmit:", error);
+      const friendlyMessage = getErrorMessage(error);
+      
       toast({
-        title: "Registration failed",
-        description: "An unexpected error occurred. Please try again.",
+        title: "Couldn't create account",
+        description: friendlyMessage,
         variant: "destructive",
       });
     } finally {
@@ -223,6 +300,9 @@ const SignUp = () => {
                     minLength={8}
                     className="transition-all focus:shadow-soft"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Must be at least 8 characters long
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="flex items-center gap-2">

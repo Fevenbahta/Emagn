@@ -16,15 +16,85 @@ const SignIn = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Extract error message from various error formats
+  const extractErrorMessage = (error: any): string => {
+    console.log("Raw error:", error);
+    
+    // If it's already a string error message
+    if (typeof error === 'string') {
+      return error;
+    }
+    
+    // If it's an Error object with message
+    if (error?.message) {
+      const message = error.message;
+      
+      // Try to parse JSON error from HTTP response
+      if (message.includes('{') && message.includes('}')) {
+        try {
+          const jsonMatch = message.match(/\{.*\}/);
+          if (jsonMatch) {
+            const errorObj = JSON.parse(jsonMatch[0]);
+            return errorObj.error || message;
+          }
+        } catch (e) {
+          console.log("Could not parse JSON from error message");
+        }
+      }
+      
+      return message;
+    }
+    
+    // If it's an object with error property
+    if (error?.error) {
+      return error.error;
+    }
+    
+    return "An unexpected error occurred";
+  };
+
+  // User-friendly error messages
+  const getErrorMessage = (error: any): string => {
+    const errorMessage = extractErrorMessage(error).toLowerCase();
+    console.log("Processed error message:", errorMessage);
+    
+    const errorMessages: { [key: string]: string } = {
+      "invalid email or password": "The email or password you entered doesn't match our records. Please try again.",
+      "user not found": "We couldn't find an account with this email address.",
+      "account locked": "Your account has been temporarily locked due to too many failed attempts. Please try again in 15 minutes or reset your password.",
+      "email not verified": "Please verify your email address before signing in. Check your inbox for the verification link.",
+      "unauthorized": "The email or password you entered doesn't match our records. Please try again.",
+    };
+    
+    // Check for partial matches
+    for (const [key, value] of Object.entries(errorMessages)) {
+      if (errorMessage.includes(key)) {
+        return value;
+      }
+    }
+    
+    return "Something went wrong. Please try again.";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Missing information",
+        description: "Please enter both email and password to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const result = await authApiService.login({ email, password });
+      console.log("Login result:", result);
 
       if (result.success && result.data) {
-        // Store the token using TokenService
         TokenService.storeToken(result.data.token);
         
         toast({
@@ -32,19 +102,24 @@ const SignIn = () => {
           description: "You have successfully signed in.",
         });
         
-        // Redirect to transactions page
         navigate("/transactions");
       } else {
+        const friendlyMessage = getErrorMessage(result.error);
+        console.log("Displaying error:", friendlyMessage);
+        
         toast({
-          title: "Sign in failed",
-          description: result.error || "Invalid email or password",
+          title: "Couldn't sign you in",
+          description: friendlyMessage,
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.log("Caught error in handleSubmit:", error);
+      const friendlyMessage = getErrorMessage(error);
+      
       toast({
-        title: "Sign in failed",
-        description: "An unexpected error occurred. Please try again.",
+        title: "Couldn't sign you in",
+        description: friendlyMessage,
         variant: "destructive",
       });
     } finally {
