@@ -1,6 +1,6 @@
 import { TokenService } from './tokenService';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://itzel-selenic-hisako.ngrok-free.dev';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://emagne.onrender.com';
 
 export interface ApiResponse<T = any> {
   data?: T;

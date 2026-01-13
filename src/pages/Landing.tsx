@@ -46,6 +46,10 @@ const Landing = () => {
               API
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green transition-all group-hover:w-full" />
             </Link>
+               <Link to="/categories" className="text-foreground hover:text-green transition-all font-medium relative group">
+              Categories
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green transition-all group-hover:w-full" />
+            </Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link to="/signin">

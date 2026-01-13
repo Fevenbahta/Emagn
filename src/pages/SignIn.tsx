@@ -8,6 +8,9 @@ import { Shield, Mail, Lock, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { authApiService } from "@/services/authApi";
 import { TokenService } from "@/services/tokenService";
+import { login as loginAction } from "@/store/authSlice";
+import type { AppDispatch } from "@/store";
+import { useDispatch } from "react-redux";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +18,7 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+    const dispatch = useDispatch<AppDispatch>();
 
   // Extract error message from various error formats
   const extractErrorMessage = (error: any): string => {
@@ -76,15 +80,11 @@ const SignIn = () => {
     return "Something went wrong. Please try again.";
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
-      toast({
-        title: "Missing information",
-        description: "Please enter both email and password to continue.",
-        variant: "destructive",
-      });
+      toast({ title: "Missing information", description: "Enter both email and password", variant: "destructive" });
       return;
     }
 
@@ -92,36 +92,33 @@ const SignIn = () => {
 
     try {
       const result = await authApiService.login({ email, password });
-      console.log("Login result:", result);
 
       if (result.success && result.data) {
-        TokenService.storeToken(result.data.token);
-        
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-        });
-        
+        // Store token & user globally in Redux
+        dispatch(
+          loginAction({
+            token: result.data.token,
+            user: {
+              id: result.data.user.id,
+              email: result.data.user.email,
+              first_name: result.data.user.first_name,
+              last_name: result.data.user.last_name,
+              role: result.data.user.role,
+            },
+          })
+        );
+
+        toast({ title: "Welcome back!", description: "Successfully signed in" });
         navigate("/transactions");
       } else {
-        const friendlyMessage = getErrorMessage(result.error);
-        console.log("Displaying error:", friendlyMessage);
-        
         toast({
-          title: "Couldn't sign you in",
-          description: friendlyMessage,
+          title: "Sign in failed",
+          description: result.error || "Something went wrong. Please try again.",
           variant: "destructive",
         });
       }
-    } catch (error: any) {
-      console.log("Caught error in handleSubmit:", error);
-      const friendlyMessage = getErrorMessage(error);
-      
-      toast({
-        title: "Couldn't sign you in",
-        description: friendlyMessage,
-        variant: "destructive",
-      });
+    } catch (err: any) {
+      toast({ title: "Sign in failed", description: err.message || "Something went wrong.", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
