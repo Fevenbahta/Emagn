@@ -1,4 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // ADD useNavigate import
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store";
+import { logout } from "@/store/authSlice"; // Make sure this exists
 import { Shield, Lock, Users, TrendingUp, Zap, Globe, CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +11,19 @@ import collaborationGraphic from "@/assets/collaboration-graphic.png";
 import fastPaymentGraphic from "@/assets/fast-payment-graphic.png";
 
 const Landing = () => {
+  const navigate = useNavigate(); // ADD this line
+  const dispatch = useDispatch();
+  const auth = useSelector((state: RootState) => state.auth);
+  const { user, token } = auth;
+  
+  // Derive isAuthenticated from token
+  const isAuthenticated = !!token && !!user;
+  
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/"); // Use navigate here
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-green-lighter/10 to-background overflow-hidden">
       {/* Animated Background Elements */}
@@ -46,24 +62,52 @@ const Landing = () => {
               API
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green transition-all group-hover:w-full" />
             </Link>
-               <Link to="/categories" className="text-foreground hover:text-green transition-all font-medium relative group">
-              Categories
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green transition-all group-hover:w-full" />
-            </Link>
+            
+            {/* Only show Categories link for super_admin */}
+            {isAuthenticated && user?.role === "super_admin" && (
+              <Link to="/categories" className="text-foreground hover:text-green transition-all font-medium relative group">
+                Categories
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green transition-all group-hover:w-full" />
+              </Link>
+            )}
           </nav>
           <div className="flex items-center gap-3">
-            <Link to="/signin">
-              <Button variant="ghost" className="hover:bg-green-lighter/50 hover:text-green-darker">Sign In</Button>
-            </Link>
-            <Link to="/signup">
-              <Button className="bg-gradient-to-r from-green via-green-dark to-green-darker hover:opacity-90 shadow-lg shadow-green/30 relative overflow-hidden group">
-                <span className="relative z-10">Get Started</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-green-lighter to-green opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                {/* Show user info and role badge */}
+                <div className="flex items-center gap-2 px-3 py-1 bg-accent rounded-full">
+                  <span className="text-sm font-medium">
+                    {user?.first_name} {user?.last_name}
+                  </span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-green text-white">
+                    {user?.role === "super_admin" ? "Admin" : user?.role}
+                  </span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  onClick={handleLogout}
+                  className="hover:bg-destructive/10 hover:text-destructive"
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/signin">
+                  <Button variant="ghost" className="hover:bg-green-lighter/50 hover:text-green-darker">Sign In</Button>
+                </Link>
+                <Link to="/signup">
+                  <Button className="bg-gradient-to-r from-green via-green-dark to-green-darker hover:opacity-90 shadow-lg shadow-green/30 relative overflow-hidden group">
+                    <span className="relative z-10">Get Started</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-lighter to-green opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
+      
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-20 pb-32">
@@ -89,7 +133,7 @@ const Landing = () => {
                 Trust-based platform connecting buyers, sellers, and brokers with <span className="text-green-dark font-semibold">complete financial security</span> and transparency.
               </p>
               <div className="flex flex-col sm:flex-row gap-5 pt-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <Link to="/transaction/create">
+                <Link to="/transactions">
                   <Button size="lg" className="bg-gradient-to-r from-green to-green-dark hover:from-green-dark hover:to-green-darker shadow-2xl shadow-green/40 text-lg px-10 py-7 group relative overflow-hidden">
                     <span className="relative z-10 flex items-center gap-2 font-bold">
                       Start Transaction
