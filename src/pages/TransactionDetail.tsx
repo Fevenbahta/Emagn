@@ -1,7 +1,3 @@
-
-
-
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -65,6 +61,33 @@ interface Transaction {
   }>;
 }
 
+// Create a more flexible interface for API response
+interface ApiTransaction {
+  id: string;
+  title: ApiStringField | string;
+  role: string;
+  currency: string;
+  inspection_period: ApiStringField | string;
+  item_category_id: string;
+  item_name: string;
+  item_description: ApiStringField | string;
+  price: string;
+  shipping_method: ApiStringField | string;
+  seller_email: string;
+  seller_phone: ApiStringField | string;
+  buyer_email: string;
+  buyer_phone: ApiStringField | string;
+  status: ApiStringField | string;
+  created_at: ApiDateTime | string | 0;
+  updated_at: ApiDateTime | string | 0;
+  item_category_name: string;
+  item_category_description: ApiStringField | string;
+  attributes?: Array<{
+    attribute_id: string;
+    value: string;
+  }>;
+}
+
 const TransactionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -76,19 +99,39 @@ const TransactionDetail = () => {
   const [addingAttribute, setAddingAttribute] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
-  // Helper function to extract string from ApiStringField
+  // Helper function to extract string from ApiStringField or string
   const extractString = (field: ApiStringField | string | any): string => {
     if (!field) return '';
     if (typeof field === 'string') return field;
-    if (field.String !== undefined) return field.String || '';
-    return String(field);
+    if (field && typeof field === 'object' && 'String' in field) return field.String || '';
+    return String(field || '');
+  };
+
+  // Helper to normalize ApiDateTime or string or 0 to ApiDateTime
+  const normalizeDate = (dateField: ApiDateTime | string | 0): ApiDateTime => {
+    if (!dateField) {
+      return { Time: '', Valid: false };
+    }
+    
+    if (typeof dateField === 'object' && 'Time' in dateField && 'Valid' in dateField) {
+      return dateField;
+    }
+    
+    if (typeof dateField === 'string') {
+      return { Time: dateField, Valid: !!dateField };
+    }
+    
+    return { Time: '', Valid: false };
   };
 
   // Helper to format date
-  const formatDate = (dateField: ApiDateTime): string => {
-    if (!dateField?.Valid) return 'Unknown date';
+  const formatDate = (dateField: ApiDateTime | string | 0): string => {
+    const normalizedDate = normalizeDate(dateField);
+    
+    if (!normalizedDate?.Valid) return 'Unknown date';
     try {
-      const date = new Date(dateField.Time);
+      const date = new Date(normalizedDate.Time);
+      if (isNaN(date.getTime())) return 'Invalid date';
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -101,6 +144,39 @@ const TransactionDetail = () => {
     }
   };
 
+  // Helper to normalize API response to Transaction interface
+  const normalizeTransaction = (apiData: ApiTransaction): Transaction => {
+    return {
+      ...apiData,
+      title: typeof apiData.title === 'string' 
+        ? { String: apiData.title, Valid: !!apiData.title } 
+        : apiData.title,
+      inspection_period: typeof apiData.inspection_period === 'string'
+        ? { String: apiData.inspection_period, Valid: !!apiData.inspection_period }
+        : apiData.inspection_period,
+      item_description: typeof apiData.item_description === 'string'
+        ? { String: apiData.item_description, Valid: !!apiData.item_description }
+        : apiData.item_description,
+      shipping_method: typeof apiData.shipping_method === 'string'
+        ? { String: apiData.shipping_method, Valid: !!apiData.shipping_method }
+        : apiData.shipping_method,
+      seller_phone: typeof apiData.seller_phone === 'string'
+        ? { String: apiData.seller_phone, Valid: !!apiData.seller_phone }
+        : apiData.seller_phone,
+      buyer_phone: typeof apiData.buyer_phone === 'string'
+        ? { String: apiData.buyer_phone, Valid: !!apiData.buyer_phone }
+        : apiData.buyer_phone,
+      status: typeof apiData.status === 'string'
+        ? { String: apiData.status, Valid: !!apiData.status }
+        : apiData.status,
+      created_at: normalizeDate(apiData.created_at),
+      updated_at: normalizeDate(apiData.updated_at),
+      item_category_description: typeof apiData.item_category_description === 'string'
+        ? { String: apiData.item_category_description, Valid: !!apiData.item_category_description }
+        : apiData.item_category_description,
+    };
+  };
+
   useEffect(() => {
     fetchTransaction();
     fetchAttributes();
@@ -109,6 +185,8 @@ const TransactionDetail = () => {
   const fetchTransaction = async () => {
     try {
       const data = await transactionApi.getById(id!);
+      // Normalize the API response to match our Transaction interface
+      const normalizedTransaction = normalizeTransaction(data) // data from API;
       setTransaction(data);
     } catch (err: any) {
       toast({
@@ -299,7 +377,7 @@ const TransactionDetail = () => {
                       Price
                     </Label>
                     <p className="text-2xl font-bold">
-                      {transaction.currency} {parseFloat(transaction.price || 0).toLocaleString()}
+                      {transaction.currency} {parseFloat(transaction.price || '0').toLocaleString()}
                     </p>
                   </div>
                   <div className="space-y-2">
