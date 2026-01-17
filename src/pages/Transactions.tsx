@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, Filter, Plus, RefreshCw, Search, Calendar, Download, ArrowLeft } from "lucide-react";
 import { transactionApi } from "@/services/transactionApi";
+import { categoryApi } from "@/services/categoryApi";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,214 +45,6 @@ interface Transaction {
   item_category_description: string | ApiStringField;
   [key: string]: any;
 }
-
-// Your provided data
-const mockTransactions: Transaction[] = [
-  {
-    "id": "a19f2cda-6596-4db9-b356-9d32b0373f92",
-    "title": {
-      "String": "Phone Escrow",
-      "Valid": true
-    },
-    "role": "Buyer",
-    "currency": "ETB",
-    "inspection_period": {
-      "String": "7 days",
-      "Valid": true
-    },
-    "item_category_id": "fb0de8de-41fc-47e0-9684-2fad376e2c72",
-    "item_name": "iPhone 13",
-    "item_description": {
-      "String": "Like new",
-      "Valid": true
-    },
-    "price": "19999",
-    "shipping_method": {
-      "String": "Courier",
-      "Valid": true
-    },
-    "seller_email": "seller@example.com",
-    "seller_phone": {
-      "String": "+251911111111",
-      "Valid": true
-    },
-    "buyer_email": "buyer@example.com",
-    "buyer_phone": {
-      "String": "+251922222222",
-      "Valid": true
-    },
-    "status": {
-      "String": "PendingSellerConfirm",
-      "Valid": true
-    },
-    "created_at": {
-      "Time": "2026-01-15T12:38:00.454412Z",
-      "Valid": true
-    },
-    "updated_at": {
-      "Time": "2026-01-15T12:38:00.454412Z",
-      "Valid": true
-    },
-    "item_category_name": "Electronics",
-    "item_category_description": {
-      "String": "Devices and gadgets",
-      "Valid": true
-    }
-  },
-  {
-    "id": "9e243e8e-0936-454d-b868-e034c0623cd8",
-    "title": {
-      "String": "Phone Escrow",
-      "Valid": true
-    },
-    "role": "Buyer",
-    "currency": "ETB",
-    "inspection_period": {
-      "String": "7 days",
-      "Valid": true
-    },
-    "item_category_id": "fb0de8de-41fc-47e0-9684-2fad376e2c72",
-    "item_name": "iPhone 13",
-    "item_description": {
-      "String": "Like new",
-      "Valid": true
-    },
-    "price": "19999",
-    "shipping_method": {
-      "String": "Courier",
-      "Valid": true
-    },
-    "seller_email": "seller@example.com",
-    "seller_phone": {
-      "String": "+251911111111",
-      "Valid": true
-    },
-    "buyer_email": "buyer@example.com",
-    "buyer_phone": {
-      "String": "+251922222222",
-      "Valid": true
-    },
-    "status": {
-      "String": "PendingSellerConfirm",
-      "Valid": true
-    },
-    "created_at": {
-      "Time": "2026-01-15T12:34:49.256259Z",
-      "Valid": true
-    },
-    "updated_at": {
-      "Time": "2026-01-15T12:34:49.256259Z",
-      "Valid": true
-    },
-    "item_category_name": "Electronics",
-    "item_category_description": {
-      "String": "Devices and gadgets",
-      "Valid": true
-    }
-  },
-  {
-    "id": "04bf597a-1137-41cf-8ff6-0a4f089bba1c",
-    "title": {
-      "String": "Phone Escrow",
-      "Valid": true
-    },
-    "role": "Buyer",
-    "currency": "ETB",
-    "inspection_period": {
-      "String": "7 days",
-      "Valid": true
-    },
-    "item_category_id": "fb0de8de-41fc-47e0-9684-2fad376e2c72",
-    "item_name": "iPhone 13",
-    "item_description": {
-      "String": "Like new",
-      "Valid": true
-    },
-    "price": "19999",
-    "shipping_method": {
-      "String": "Courier",
-      "Valid": true
-    },
-    "seller_email": "seller@example.com",
-    "seller_phone": {
-      "String": "+251911111111",
-      "Valid": true
-    },
-    "buyer_email": "buyer@example.com",
-    "buyer_phone": {
-      "String": "+251922222222",
-      "Valid": true
-    },
-    "status": {
-      "String": "PendingSellerConfirm",
-      "Valid": true
-    },
-    "created_at": {
-      "Time": "2026-01-15T12:33:52.485635Z",
-      "Valid": true
-    },
-    "updated_at": {
-      "Time": "2026-01-15T12:33:52.485635Z",
-      "Valid": true
-    },
-    "item_category_name": "Electronics",
-    "item_category_description": {
-      "String": "Devices and gadgets",
-      "Valid": true
-    }
-  },
-  {
-    "id": "99fc9130-9e9c-47ea-9135-388adf38c530",
-    "title": {
-      "String": "Phone Escrow",
-      "Valid": true
-    },
-    "role": "Buyer",
-    "currency": "ETB",
-    "inspection_period": {
-      "String": "7 days",
-      "Valid": true
-    },
-    "item_category_id": "fb0de8de-41fc-47e0-9684-2fad376e2c72",
-    "item_name": "iPhone 13",
-    "item_description": {
-      "String": "Like new",
-      "Valid": true
-    },
-    "price": "19999",
-    "shipping_method": {
-      "String": "Courier",
-      "Valid": true
-    },
-    "seller_email": "seller@example.com",
-    "seller_phone": {
-      "String": "+251911111111",
-      "Valid": true
-    },
-    "buyer_email": "buyer@example.com",
-    "buyer_phone": {
-      "String": "+251922222222",
-      "Valid": true
-    },
-    "status": {
-      "String": "Pending",
-      "Valid": true
-    },
-    "created_at": {
-      "Time": "2026-01-02T11:55:24.704987Z",
-      "Valid": true
-    },
-    "updated_at": {
-      "Time": "2026-01-02T11:55:24.704987Z",
-      "Valid": true
-    },
-    "item_category_name": "Electronics",
-    "item_category_description": {
-      "String": "Devices and gadgets",
-      "Valid": true
-    }
-  }
-];
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -295,94 +88,187 @@ const Transactions = () => {
     }
   };
 
-  // Fetch transactions from API
-  const fetchTransactions = async () => {
+  // Format date for sorting/display
+  const formatDateOnly = (dateField: ApiDateTime): string => {
+    if (!dateField?.Valid) return 'Unknown date';
+    try {
+      const date = new Date(dateField.Time);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch {
+      return 'Invalid date';
+    }
+  };
+
+  // Fetch categories from API
+  const fetchCategories = async () => {
+    try {
+      const categoriesData = await categoryApi.getAll();
+      const formattedCategories = categoriesData.map(cat => ({
+        id: cat.id,
+        name: extractString(cat.name) || 'Unknown Category'
+      }));
+      setCategories(formattedCategories);
+      console.log(`Loaded ${formattedCategories.length} categories from API`);
+      return formattedCategories;
+    } catch (err: any) {
+      console.error("Error fetching categories:", err);
+      toast({ 
+        title: "Error fetching categories", 
+        description: err.message || "Failed to load categories", 
+        variant: "destructive" 
+      });
+      return [];
+    }
+  };
+
+  // Fetch transactions from API - Modified to handle category changes
+  const fetchTransactions = async (categoryId?: string) => {
     setLoading(true);
     try {
       let data;
       
-      // Use mock data or API data
-      const useMockData = true; // Set to false to use real API
-      
-      if (useMockData) {
-        // Use provided mock data
-        data = mockTransactions;
-      } else {
-        // Try to fetch from API
+      // If a specific category is provided, fetch transactions for that category
+      if (categoryId && categoryId !== "all") {
+        data = await transactionApi.getByCategory(categoryId, { limit: 100, offset: 0 });
+      } 
+      // Otherwise, try to get all transactions, with fallback to first category
+      else {
         try {
-          data = await transactionApi.getAll({ limit: 50, offset: 0 });
-          if (!Array.isArray(data)) {
-            throw new Error("Invalid data format from API");
-          }
+          data = await transactionApi.getAll({ limit: 100, offset: 0 });
         } catch (err) {
-          console.log("Using mock data due to API error:", err);
-          data = mockTransactions;
+          console.log("Could not fetch all transactions, trying category-based...");
+          // If that fails, try with a default category (first one)
+          if (categories.length > 0) {
+            data = await transactionApi.getByCategory(categories[0].id, { limit: 100, offset: 0 });
+          } else {
+            data = [];
+          }
         }
       }
       
-      // Extract unique categories from transactions
-      const uniqueCategories = Array.from(
-        new Map(
-          data
-            .filter(txn => txn.item_category_id)
-            .map(txn => [
-              txn.item_category_id,
-              {
-                id: txn.item_category_id || 'unknown',
-                name: extractString(txn.item_category_name) || 'Unknown Category'
-              }
-            ])
-        ).values()
-      );
+      // Handle different response formats
+      let transactionsArray: Transaction[] = [];
       
-      setCategories(uniqueCategories);
-      setTransactions(data);
-      setFilteredTransactions(data);
+      if (Array.isArray(data)) {
+        transactionsArray = data;
+      } else if (data && typeof data === 'object') {
+        // If API returns an object with a data property
+        if (Array.isArray(data.data)) {
+          transactionsArray = data.data;
+        } else if (Array.isArray(data.transactions)) {
+          transactionsArray = data.transactions;
+        } else if (Array.isArray(data.items)) {
+          transactionsArray = data.items;
+        }
+      }
       
-      console.log(`Loaded ${data.length} transactions`);
-      console.log(`Found ${uniqueCategories.length} unique categories`);
+      // Sort by most recent first
+      transactionsArray.sort((a, b) => {
+        try {
+          const dateA = a.created_at?.Valid ? new Date(a.created_at.Time).getTime() : 0;
+          const dateB = b.created_at?.Valid ? new Date(b.created_at.Time).getTime() : 0;
+          return dateB - dateA;
+        } catch {
+          return 0;
+        }
+      });
+      
+      setTransactions(transactionsArray);
+      setFilteredTransactions(transactionsArray);
+      
+      console.log(`Loaded ${transactionsArray.length} transactions for ${categoryId === "all" ? "all categories" : `category ${categoryId}`}`);
       
       toast({ 
         title: "Success", 
-        description: `Loaded ${data.length} transactions`, 
+        description: `Loaded ${transactionsArray.length} transactions`, 
+        variant: "default"
       });
       
     } catch (err: any) {
       console.error("Error fetching transactions:", err);
+      
+      // Provide more specific error message
+      let errorMessage = "Failed to load transactions";
+      if (err.response) {
+        errorMessage = `Server error: ${err.response.status}`;
+        if (err.response.data?.message) {
+          errorMessage += ` - ${err.response.data.message}`;
+        }
+      } else if (err.request) {
+        errorMessage = "Network error: Could not reach server";
+      } else {
+        errorMessage = `Error: ${err.message}`;
+      }
+      
       toast({ 
         title: "Error fetching transactions", 
-        description: err.message || "Failed to load transactions", 
+        description: errorMessage, 
         variant: "destructive" 
       });
-      // Fallback to mock data
-      setTransactions(mockTransactions);
-      setFilteredTransactions(mockTransactions);
-      setCategories([{ id: "fb0de8de-41fc-47e0-9684-2fad376e2c72", name: "Electronics" }]);
+      
+      // Set empty arrays
+      setTransactions([]);
+      setFilteredTransactions([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch all transactions on component mount
+  // Handle category filter change - fetch new transactions for selected category
+  const handleCategoryChange = async (value: string) => {
+    setCategoryFilter(value);
+    await fetchTransactions(value === "all" ? undefined : value);
+  };
+
+  // Fetch all data on component mount
   useEffect(() => {
-    fetchTransactions();
+    const fetchAllData = async () => {
+      // First fetch categories
+      const fetchedCategories = await fetchCategories();
+      
+      // Then fetch transactions (initially for all or first category)
+      // If we have categories, use the first one as initial
+      if (fetchedCategories.length > 0) {
+        // Option 1: Fetch for all categories initially
+        // await fetchTransactions();
+        
+        // Option 2: Fetch for first category initially (your current approach)
+        await fetchTransactions(fetchedCategories[0].id);
+        setCategoryFilter(fetchedCategories[0].id);
+      } else {
+        // Try to fetch all if no categories
+        await fetchTransactions();
+      }
+    };
+    
+    fetchAllData();
   }, []);
+
+  // Refresh both categories and transactions
+  const handleRefresh = async () => {
+    await fetchCategories();
+    await fetchTransactions(categoryFilter === "all" ? undefined : categoryFilter);
+  };
 
   // Filter transactions based on search term, filters, and active tab
   useEffect(() => {
-    let filtered = transactions;
+    let filtered = [...transactions];
     
     // Apply tab filter
     if (activeTab !== "all") {
       filtered = filtered.filter(txn => {
-        const status = extractString(txn.status);
-        return status.toLowerCase().includes(activeTab.toLowerCase());
+        const status = extractString(txn.status).toLowerCase();
+        return status.includes(activeTab.toLowerCase());
       });
     }
     
     // Apply search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
       filtered = filtered.filter(txn => {
         const title = extractString(txn.title).toLowerCase();
         const id = txn.id?.toLowerCase() || '';
@@ -392,6 +278,7 @@ const Transactions = () => {
         const sellerEmail = txn.seller_email?.toLowerCase() || '';
         const buyerEmail = txn.buyer_email?.toLowerCase() || '';
         const price = txn.price || '';
+        const currency = extractString(txn.currency).toLowerCase();
         
         return (
           title.includes(term) ||
@@ -401,7 +288,8 @@ const Transactions = () => {
           categoryName.includes(term) ||
           sellerEmail.includes(term) ||
           buyerEmail.includes(term) ||
-          price.includes(term)
+          price.includes(term) ||
+          currency.includes(term)
         );
       });
     }
@@ -409,29 +297,26 @@ const Transactions = () => {
     // Apply status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter(txn => {
-        const status = extractString(txn.status) || '';
-        return status.toLowerCase() === statusFilter.toLowerCase();
+        const status = extractString(txn.status).toLowerCase();
+        return status === statusFilter.toLowerCase();
       });
     }
     
-    // Apply category filter
-    if (categoryFilter !== "all") {
-      filtered = filtered.filter(txn => {
-        return txn.item_category_id === categoryFilter;
-      });
-    }
+    // Note: We no longer apply category filter here since we fetch by category
     
     setFilteredTransactions(filtered);
-  }, [searchTerm, statusFilter, categoryFilter, activeTab, transactions]);
+  }, [searchTerm, statusFilter, activeTab, transactions]);
 
   // Get all unique statuses from transactions
   const getUniqueStatuses = () => {
     const statuses = new Set<string>();
     transactions.forEach(txn => {
       const status = extractString(txn.status);
-      if (status) statuses.add(status);
+      if (status && status.trim()) {
+        statuses.add(status);
+      }
     });
-    return Array.from(statuses);
+    return Array.from(statuses).sort();
   };
 
   const getStatusColor = (status: string): string => {
@@ -444,11 +329,15 @@ const Transactions = () => {
     if (statusStr.includes('closed')) return "bg-gray-600";
     if (statusStr.includes('shipped')) return "bg-purple-500";
     if (statusStr.includes('action') || statusStr.includes('required')) return "bg-red-500";
+    if (statusStr.includes('completed')) return "bg-green-600";
+    if (statusStr.includes('failed') || statusStr.includes('cancelled')) return "bg-red-600";
     
     return "bg-gray-500";
   };
 
   const getStatusDisplay = (status: string): string => {
+    if (!status) return 'Unknown Status';
+    
     return status
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, str => str.toUpperCase())
@@ -461,7 +350,7 @@ const Transactions = () => {
     
     let variant: "default" | "secondary" | "destructive" | "outline" = "default";
     if (color.includes('red')) variant = "destructive";
-    if (color.includes('orange')) variant = "outline";
+    if (color.includes('orange') || color.includes('yellow')) variant = "outline";
     
     return (
       <Badge variant={variant} className={color === "bg-gray-500" ? "" : `text-white ${color}`}>
@@ -472,7 +361,7 @@ const Transactions = () => {
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
     try {
-      // In a real app, this would call the API
+      // Call API to update status
       await transactionApi.updateStatus(id, newStatus);
       
       // Update local state
@@ -487,9 +376,18 @@ const Transactions = () => {
         description: `Status updated to ${getStatusDisplay(newStatus)}`,
       });
     } catch (err: any) {
+      console.error("Error updating status:", err);
+      
+      let errorMessage = "Failed to update status";
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
       toast({
         title: "Update Failed",
-        description: err.message || "Failed to update status",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -500,49 +398,98 @@ const Transactions = () => {
   };
 
   const handleExportData = () => {
-    // Export filtered transactions as JSON
-    const exportData = filteredTransactions.map(txn => ({
-      id: txn.id,
-      title: extractString(txn.title),
-      status: extractString(txn.status),
-      item: extractString(txn.item_name),
-      category: extractString(txn.item_category_name),
-      price: `${extractString(txn.currency)} ${txn.price}`,
-      role: txn.role,
-      seller: txn.seller_email,
-      buyer: txn.buyer_email,
-      created: formatDate(txn.created_at)
-    }));
+    if (filteredTransactions.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "There are no transactions to export",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `transactions-export-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({
-      title: "Export Successful",
-      description: `Exported ${exportData.length} transactions`,
-    });
+    try {
+      // Export filtered transactions as CSV
+      const headers = [
+        'ID',
+        'Title',
+        'Status',
+        'Item Name',
+        'Category',
+        'Price',
+        'Currency',
+        'Role',
+        'Seller Email',
+        'Buyer Email',
+        'Created Date',
+        'Last Updated'
+      ];
+      
+      const csvData = filteredTransactions.map(txn => [
+        txn.id,
+        extractString(txn.title),
+        extractString(txn.status),
+        extractString(txn.item_name),
+        extractString(txn.item_category_name),
+        txn.price,
+        extractString(txn.currency),
+        txn.role,
+        txn.seller_email,
+        txn.buyer_email,
+        formatDateOnly(txn.created_at),
+        formatDateOnly(txn.updated_at)
+      ]);
+      
+      const csvContent = [
+        headers.join(','),
+        ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
+      ].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `transactions_export_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Export Successful",
+        description: `Exported ${filteredTransactions.length} transactions as CSV`,
+      });
+    } catch (err) {
+      console.error("Error exporting data:", err);
+      toast({
+        title: "Export Failed",
+        description: "Failed to export transactions",
+        variant: "destructive"
+      });
+    }
   };
 
   const calculateStats = () => {
     const total = transactions.length;
     const pending = transactions.filter(t => {
-      const status = extractString(t.status);
-      return status.toLowerCase().includes('pending');
+      const status = extractString(t.status).toLowerCase();
+      return status.includes('pending');
     }).length;
     const pendingSellerConfirm = transactions.filter(t => {
-      const status = extractString(t.status);
-      return status === 'PendingSellerConfirm';
+      const status = extractString(t.status).toLowerCase();
+      return status.includes('pending') && status.includes('seller');
     }).length;
-    const totalValue = transactions.reduce((sum, t) => sum + parseFloat(t.price || '0'), 0);
+    const completed = transactions.filter(t => {
+      const status = extractString(t.status).toLowerCase();
+      return status.includes('completed') || status.includes('closed') || status.includes('delivered');
+    }).length;
+    const totalValue = transactions.reduce((sum, t) => {
+      const price = parseFloat(t.price || '0');
+      return isNaN(price) ? sum : sum + price;
+    }, 0);
     
-    return { total, pending, pendingSellerConfirm, totalValue };
+    return { total, pending, pendingSellerConfirm, completed, totalValue };
   };
 
   const uniqueStatuses = getUniqueStatuses();
@@ -552,27 +499,35 @@ const Transactions = () => {
     <div className="p-6 min-h-screen bg-gradient-to-b from-background to-secondary">
       <div className="flex justify-between items-center mb-6">
         <div>
-         <Button
-              variant="ghost"
-              onClick={() => navigate("/")}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
+           <Button
+                                    variant="ghost"
+                                    onClick={() => navigate("/")}
+                                    className="gap-2"
+                                  >
+                                    <ArrowLeft className="h-4 w-4" />
+                                    Back
+                                  </Button>
           <h1 className="text-3xl font-bold">Transactions</h1>
           <p className="text-muted-foreground">Manage and monitor all transaction activities</p>
         </div>
         <div className="flex gap-4">
-          <Button onClick={fetchTransactions} variant="outline">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+          <Button 
+            onClick={handleRefresh} 
+            variant="outline"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Refreshing...' : 'Refresh'}
           </Button>
-          <Button onClick={handleExportData} variant="outline">
+          <Button 
+            onClick={handleExportData} 
+            variant="outline"
+            disabled={filteredTransactions.length === 0}
+          >
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button onClick={() => navigate("/transaction/create")}>
+          <Button onClick={() => navigate("/transactions/create")}>
             <Plus className="h-4 w-4 mr-2" />
             New Transaction
           </Button>
@@ -609,14 +564,14 @@ const Transactions = () => {
 
       {/* Tabs for quick filtering */}
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
-          <TabsTrigger value="all">All ({transactions.length})</TabsTrigger>
-          <TabsTrigger value="pending">Pending ({stats.pending})</TabsTrigger>
-          <TabsTrigger value="pendingsellerconfirm">
+        <TabsList className="flex flex-wrap w-full max-w-3xl">
+          <TabsTrigger value="all" className="flex-1 min-w-[120px]">All ({transactions.length})</TabsTrigger>
+          <TabsTrigger value="pending" className="flex-1 min-w-[120px]">Pending ({stats.pending})</TabsTrigger>
+          <TabsTrigger value="pendingsellerconfirm" className="flex-1 min-w-[150px]">
             Awaiting Seller ({stats.pendingSellerConfirm})
           </TabsTrigger>
-          <TabsTrigger value="confirmed">Confirmed</TabsTrigger>
-          <TabsTrigger value="open">Open</TabsTrigger>
+          <TabsTrigger value="completed" className="flex-1 min-w-[120px]">Completed ({stats.completed})</TabsTrigger>
+          <TabsTrigger value="confirmed" className="flex-1 min-w-[120px]">Confirmed</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -633,15 +588,20 @@ const Transactions = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"
+                  disabled={loading}
                 />
               </div>
             </div>
             
             <div className="space-y-2">
               <Label className="text-sm font-medium">Category</Label>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <Select 
+                value={categoryFilter} 
+                onValueChange={handleCategoryChange}
+                disabled={loading || categories.length === 0}
+              >
                 <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="All Categories" />
+                  <SelectValue placeholder={categories.length === 0 ? "No categories" : "Select Category"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
@@ -656,7 +616,11 @@ const Transactions = () => {
             
             <div className="space-y-2">
               <Label className="text-sm font-medium">Status</Label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select 
+                value={statusFilter} 
+                onValueChange={setStatusFilter}
+                disabled={loading}
+              >
                 <SelectTrigger className="w-[180px]">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="All Statuses" />
@@ -677,10 +641,12 @@ const Transactions = () => {
               onClick={() => {
                 setSearchTerm("");
                 setStatusFilter("all");
-                setCategoryFilter("all");
                 setActiveTab("all");
+                // When clearing filters, we fetch for all categories
+                handleCategoryChange("all");
               }}
               className="h-10"
+              disabled={loading}
             >
               Clear Filters
             </Button>
@@ -692,9 +658,14 @@ const Transactions = () => {
       <Card className="shadow-xl border-2">
         <CardContent className="p-0">
           {loading ? (
-            <div className="flex justify-center items-center h-64">
+            <div className="flex flex-col justify-center items-center h-64">
               <RefreshCw className="h-8 w-8 animate-spin" />
-              <span className="ml-3">Loading transactions...</span>
+              <span className="ml-3 mt-2">Loading transactions...</span>
+              <p className="text-sm text-muted-foreground mt-1">
+                {categoryFilter === "all" 
+                  ? "Fetching all transactions..." 
+                  : `Fetching transactions for ${categories.find(c => c.id === categoryFilter)?.name || "selected category"}...`}
+              </p>
             </div>
           ) : transactions.length === 0 ? (
             <div className="text-center py-12">
@@ -702,16 +673,43 @@ const Transactions = () => {
                 <Search className="h-12 w-12 mx-auto opacity-50" />
                 <h3 className="text-lg font-semibold mt-4">No Transactions Found</h3>
                 <p className="mt-2">
-                  No transactions found. Create your first transaction to get started.
+                  {categoryFilter === "all" 
+                    ? "No transactions found. Create your first transaction to get started."
+                    : `No transactions found in this category. Try selecting a different category or create a new transaction.`}
                 </p>
               </div>
-              <Button onClick={() => navigate("/transaction/create")}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Your First Transaction
-              </Button>
+              <div className="flex gap-4 justify-center">
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleCategoryChange("all")}
+                >
+                  View All Categories
+                </Button>
+                <Button onClick={() => navigate("/transactions/create")}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Transaction
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="overflow-x-auto">
+              <div className="p-4 bg-muted/30 border-b">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <span className="font-medium">
+                      {categoryFilter === "all" 
+                        ? "All Categories" 
+                        : `Category: ${categories.find(c => c.id === categoryFilter)?.name || "Selected"}`}
+                    </span>
+                    <span className="text-sm text-muted-foreground ml-2">
+                      ({filteredTransactions.length} of {transactions.length} transactions)
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Showing {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''}
+                  </div>
+                </div>
+              </div>
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50">
@@ -742,14 +740,16 @@ const Transactions = () => {
                           <div>
                             <p className="font-medium">{title || 'Untitled Transaction'}</p>
                             <p className="text-xs text-muted-foreground font-mono">
-                              ID: {txn.id}
+                              ID: {txn.id.substring(0, 8)}...
                             </p>
-                            <p className="text-xs text-blue-600 mt-1">
-                              Seller: {txn.seller_email}
-                            </p>
-                            <p className="text-xs text-green-600">
-                              Buyer: {txn.buyer_email}
-                            </p>
+                            <div className="mt-1 space-y-1">
+                              <p className="text-xs text-blue-600 truncate max-w-[200px]">
+                                Seller: {txn.seller_email}
+                              </p>
+                              <p className="text-xs text-green-600 truncate max-w-[200px]">
+                                Buyer: {txn.buyer_email}
+                              </p>
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -761,6 +761,9 @@ const Transactions = () => {
                             <Badge variant="outline" className="mt-1 text-xs">
                               {categoryName || 'Unknown Category'}
                             </Badge>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Ship: {extractString(txn.shipping_method) || 'Not specified'}
+                            </p>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -784,6 +787,7 @@ const Transactions = () => {
                             <Select
                               value={status.toLowerCase()}
                               onValueChange={(value) => handleStatusUpdate(txn.id, value)}
+                              disabled={loading}
                             >
                               <SelectTrigger className="h-7 w-40">
                                 <SelectValue />
@@ -794,7 +798,9 @@ const Transactions = () => {
                                 <SelectItem value="confirmed">Confirmed</SelectItem>
                                 <SelectItem value="shipped">Shipped</SelectItem>
                                 <SelectItem value="delivered">Delivered</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
                                 <SelectItem value="closed">Closed</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -806,7 +812,7 @@ const Transactions = () => {
                               <span>{createdDate}</span>
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              Updated: {formatDate(txn.updated_at)}
+                              Updated: {formatDateOnly(txn.updated_at)}
                             </div>
                           </div>
                         </TableCell>
@@ -819,7 +825,7 @@ const Transactions = () => {
                               className="hover:bg-primary hover:text-primary-foreground"
                             >
                               <Eye className="h-4 w-4 mr-2" /> 
-                              View Details
+                              Details
                             </Button>
                           </div>
                         </TableCell>
@@ -830,18 +836,18 @@ const Transactions = () => {
                       <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                         <Search className="h-12 w-12 mx-auto opacity-50 mb-4" />
                         <h3 className="text-lg font-semibold">No matching transactions</h3>
-                        <p className="mt-2">Try adjusting your search or filters</p>
+                        <p className="mt-2">Try adjusting your search or status filter</p>
                         <Button 
                           variant="outline" 
                           className="mt-4"
                           onClick={() => {
                             setSearchTerm("");
                             setStatusFilter("all");
-                            setCategoryFilter("all");
                             setActiveTab("all");
                           }}
+                          disabled={loading}
                         >
-                          Clear All Filters
+                          Clear Search & Status Filters
                         </Button>
                       </TableCell>
                     </TableRow>
