@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye, Filter, Plus, RefreshCw, Search, Calendar, Download } from "lucide-react";
+import { Eye, Filter, Plus, RefreshCw, Search, Calendar, Download, ArrowLeft } from "lucide-react";
 import { transactionApi } from "@/services/transactionApi";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
@@ -552,6 +552,14 @@ const Transactions = () => {
     <div className="p-6 min-h-screen bg-gradient-to-b from-background to-secondary">
       <div className="flex justify-between items-center mb-6">
         <div>
+         <Button
+              variant="ghost"
+              onClick={() => navigate("/")}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
           <h1 className="text-3xl font-bold">Transactions</h1>
           <p className="text-muted-foreground">Manage and monitor all transaction activities</p>
         </div>

@@ -7,7 +7,7 @@ import {
   type Attribute 
 } from "@/services/categoryApi";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Search, Filter, LayoutGrid, List, Tag } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Filter, LayoutGrid, List, Tag, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -160,6 +160,14 @@ const CategoryList = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
+              <Button
+                          variant="ghost"
+                          onClick={() => navigate("/")}
+                          className="gap-2"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                          Back
+                        </Button>
             <h1 className="text-3xl md:text-4xl font-bold">Categories</h1>
             <p className="text-gray-500 mt-2">Manage your product categories</p>
           </div>
