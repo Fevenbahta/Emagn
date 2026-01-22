@@ -527,7 +527,7 @@ const Transactions = () => {
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button onClick={() => navigate("/transactions/create")}>
+          <Button onClick={() => navigate("/transaction/create")}>
             <Plus className="h-4 w-4 mr-2" />
             New Transaction
           </Button>
@@ -796,7 +796,7 @@ const Transactions = () => {
                                 <SelectItem value="pending">Pending</SelectItem>
                                 <SelectItem value="pendingsellerconfirm">Pending Seller Confirm</SelectItem>
                                 <SelectItem value="confirmed">Confirmed</SelectItem>
-                                <SelectItem value="shipped">Shipped</SelectItem>
+                                <SelectItem value="Shipped">Shipped</SelectItem>
                                 <SelectItem value="delivered">Delivered</SelectItem>
                                 <SelectItem value="completed">Completed</SelectItem>
                                 <SelectItem value="closed">Closed</SelectItem>
